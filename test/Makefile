@@ -8,6 +8,8 @@ TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
 PROJECT_SOURCES = project.v alu.v reg_file.v control_unit.v
 
+export GATES
+
 ifneq ($(GATES),yes)
 
 # RTL simulation:
