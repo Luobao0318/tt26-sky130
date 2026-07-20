@@ -166,7 +166,7 @@ module tt_um_Luobao0318 (
         end
         4'd9: begin  // S_EXECUTE_JUMP
           if (IR[3]) begin  // jal
-            PC <= PC + imm;
+            PC <= PC - 4 + imm;
           end
           else begin  // jalr
             PC <= (A+imm) & 32'hfffffffe;  // 寄存器基址+偏移量，且最低位置零
