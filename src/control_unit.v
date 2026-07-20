@@ -69,6 +69,10 @@ module control_unit (
                 sel_alu_in2 = (opcode == 7'b0010011) ? 1'b0 : 1'b1;  // I型选立即数(0)，R型选B(1)
                 case (funct3)
                     3'b000: alu_op = 4'b0000;  // add/sub
+                    3'b001: alu_op = 4'b0101;  // sll
+                    3'b010: alu_op = 4'b1000;  // slt
+                    3'b011: alu_op = 4'b1001;  // sltu
+                    3'b101: alu_op = 4'b0110;  // srl
                     3'b111: alu_op = 4'b0010;  // and
                     3'b110: alu_op = 4'b0011;  // or
                     3'b100: alu_op = 4'b0100;  // xor
