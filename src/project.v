@@ -25,16 +25,6 @@ module tt_um_Luobao0318 (
 
   reg [31:0] RAM [0:15];
 
-  reg [31:0] rom_data;
-  always @(*) begin
-    case (PC[5:2])
-      4'd0: rom_data = 32'h01400113;  // addi x2, x0, 20
-      4'd1: rom_data = 32'h01e00193;  // addi x3, x0, 30
-      4'd2: rom_data = 32'h003100b3;  // add x1, x2, x3
-      default: rom_data = 32'h00000013;  // NOP
-    endcase
-  end
-
   // 子模块内部信号
   wire sel_alu_in1;
   wire sel_alu_in2;
@@ -124,7 +114,7 @@ module tt_um_Luobao0318 (
     else begin
       case (current_state)
         4'd0: begin  // S_FETCH
-          IR <= rom_data;
+          IR <= RAM[ram_addr];
           PC <= PC + 4;
         end
         4'd1: begin  // S_DECODE
@@ -145,13 +135,13 @@ module tt_um_Luobao0318 (
           MDR <= RAM[ram_addr];
         end
         4'd6: begin
-          PC <= ALUOut;
+          // PC <= ALUOut;
         end
         4'd7: begin
           if (mem_write_en) begin
             RAM[ram_addr] <= B;  // store
           end
-          PC <= ALUOut;
+          // PC <= ALUOut;
         end
         4'd8: begin
           if (alu_zero && IR[14:12] == 3'b000) begin  // beq
