@@ -22,6 +22,7 @@ module reg_file (
             for (i = 1; i < 16; i = i + 1) begin
                 rf[i] <= 32'd0;
             end
+        end
         else if (we && (waddr != 4'd0)) begin
             rf[waddr] <= wdata;
         end
