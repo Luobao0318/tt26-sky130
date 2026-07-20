@@ -42,7 +42,7 @@ module control_unit (
         reg_write_en = 1'b0;
         mem_read_en = 1'b0;
         mem_write_en = 1'b0;
-        alu_op = 1'b0;
+        alu_op = 4'b0000;
         next_state = S_FETCH;
 
         case (state)
