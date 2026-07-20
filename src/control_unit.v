@@ -52,7 +52,7 @@ module control_unit (
             end
 
             S_DECODE: begin
-                if (opcode == 7'b0110011 || opcode == 7'b0010011)  // R/I
+                if (opcode == 7'b0110011 || opcode == 7'b0010011 || opcode == 7'b0110111 || opcode == 7'b0010111)  // R/I/lui/auipc
                     next_state = S_EXECUTE_ALU;
                 else if (opcode == 7'b0000011 || opcode == 7'b0100011)  // load/store
                     next_state = S_EXECUTE_MEM;
@@ -65,19 +65,26 @@ module control_unit (
 
             S_EXECUTE_ALU: begin
                 next_state = S_WRITEBACK_ALU;
-                sel_alu_in1 = 1'b0;  // 寄存器A作为输入1
-                sel_alu_in2 = (opcode == 7'b0010011) ? 1'b0 : 1'b1;  // I型选立即数(0)，R型选B(1)
-                case (funct3)
-                    3'b000: alu_op = 4'b0000;  // add/sub
-                    3'b001: alu_op = 4'b0101;  // sll
-                    3'b010: alu_op = 4'b1000;  // slt
-                    3'b011: alu_op = 4'b1001;  // sltu
-                    3'b101: alu_op = 4'b0110;  // srl
-                    3'b111: alu_op = 4'b0010;  // and
-                    3'b110: alu_op = 4'b0011;  // or
-                    3'b100: alu_op = 4'b0100;  // xor
-                    default: alu_op = 4'b0000;
-                endcase
+                sel_alu_in1 = (opcode == 7'b0110011) ? 1'b1 : 1'b0;  // auipc选pc，其余A
+                sel_alu_in2 = (opcode == 7'b0010011) ? 1'b1 : 1'b0;  // I型选立即数(0)，R型选B(1)
+                if (opcode == 7'b0110111) begin
+                    aui_op = 4'b1010;  // lui
+                end
+                else if (opcode == 7'b0010111) begin
+                    aui_op = 4'b0000;  // auipc
+                else begin
+                    case (funct3)
+                        3'b000: alu_op = 4'b0000;  // add/sub
+                        3'b001: alu_op = 4'b0101;  // sll
+                        3'b010: alu_op = 4'b1000;  // slt
+                        3'b011: alu_op = 4'b1001;  // sltu
+                        3'b101: alu_op = 4'b0110;  // srl
+                        3'b111: alu_op = 4'b0010;  // and
+                        3'b110: alu_op = 4'b0011;  // or
+                        3'b100: alu_op = 4'b0100;  // xor
+                        default: alu_op = 4'b0000;
+                    endcase
+                end
             end
 
             S_WRITEBACK_ALU: begin
