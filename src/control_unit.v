@@ -72,6 +72,7 @@ module control_unit (
                 end
                 else if (opcode == 7'b0010111) begin
                     aui_op = 4'b0000;  // auipc
+                end
                 else begin
                     case (funct3)
                         3'b000: alu_op = 4'b0000;  // add/sub
