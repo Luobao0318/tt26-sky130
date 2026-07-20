@@ -97,7 +97,9 @@ module tt_um_Luobao0318 (
   wire [31:0] alu_in2 = sel_alu_in2 ? B : imm;
 
   // R型指令下add与sub判断
-  wire [3:0] final_alu_op = (alu_op == 4'b0000 && IR[6:0] == 7'b0110011 && IR[30]) ? 4'b0001 : alu_op;
+  wire [3:0] final_alu_op = (alu_op == 4'b0000 && IR[6:0] == 7'b0110011 && IR[30]) ? 4'b0001 :
+                            (alu_op == 4'b0110 && IR[30]) ? 4'b0111 :
+                            alu_op;
 
   alu alu_inst (
       .in1(alu_in1), .in2(alu_in2),
