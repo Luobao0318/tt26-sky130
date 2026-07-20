@@ -19,7 +19,7 @@ module reg_file (
     assign x1_low8 = rf[1][7:0];
 
     always @(posedge clk) begin
-        else if (we && (waddr != 4'd0)) begin
+        if (we && (waddr != 4'd0)) begin
             rf[waddr] <= wdata;
         end
     end
