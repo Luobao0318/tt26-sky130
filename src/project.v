@@ -19,8 +19,6 @@ module tt_um_Luobao0318 (
   reg [31:0] PC;
   reg [31:0] IR;  // instruction register
   reg [31:0] MDR; // memory data register
-  reg [31:0] A;   // rs1 opcode
-  reg [31:0] B;   // rs2 opcode
   reg [31:0] ALUOut;
 
   reg [31:0] RAM [0:15];
@@ -83,8 +81,8 @@ module tt_um_Luobao0318 (
     endcase
   end
 
-  wire [31:0] alu_in1 = sel_alu_in1 ? (PC - 4) : A;
-  wire [31:0] alu_in2 = sel_alu_in2 ? B : imm;
+  wire [31:0] alu_in1 = sel_alu_in1 ? (PC - 4) : reg_rdata1;
+  wire [31:0] alu_in2 = sel_alu_in2 ? reg_rdata2 : imm;
 
   // R型指令下add与sub判断
   wire [3:0] final_alu_op = (alu_op == 4'b0000 && IR[6:0] == 7'b0110011 && IR[30]) ? 4'b0001 :
@@ -106,8 +104,8 @@ module tt_um_Luobao0318 (
 
   initial begin
     for (j = 0; j < 16; j = j + 1) begin
-        RAM[j] <= 32'd0;
-      end
+      RAM[j] <= 32'd0;
+    end
   end
 
   always @(posedge clk or negedge rst_n) begin
@@ -115,8 +113,6 @@ module tt_um_Luobao0318 (
       PC <= 32'd0;
       IR <= 32'd0;
       MDR <= 32'd0;
-      A <= 32'd0;
-      B <= 32'd0;
       ALUOut <= 32'd0;
     end
     else begin
@@ -126,8 +122,6 @@ module tt_um_Luobao0318 (
           PC <= PC + 4;
         end
         4'd1: begin  // S_DECODE
-          A <= reg_rdata1;  // 读出数据暂存到A, B
-          B <= reg_rdata2;
           ALUOut <= PC;  // 备份PC
         end
         4'd2: begin
@@ -147,7 +141,7 @@ module tt_um_Luobao0318 (
         end
         4'd7: begin
           if (mem_write_en) begin
-            RAM[ram_addr] <= B;  // store
+            RAM[ram_addr] <= reg_rdata2;  // store
           end
           // PC <= ALUOut;
         end
@@ -167,7 +161,7 @@ module tt_um_Luobao0318 (
             PC <= PC - 4 + imm;
           end
           else begin  // jalr
-            PC <= (A+imm) & 32'hfffffffe;  // 寄存器基址+偏移量，且最低位置零
+            PC <= (reg_rdata1+imm) & 32'hfffffffe;  // 寄存器基址+偏移量，且最低位置零
           end
         end
       endcase
