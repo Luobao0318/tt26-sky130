@@ -145,7 +145,9 @@ module tt_um_Luobao0318 (
           PC <= ALUOut;
         end
         4'd7: begin
-          RAM[ram_addr] <= B;  // store
+          if (mem_write_en) begin
+            RAM[ram_addr] <= B;  // store
+          end
           PC <= ALUOut;
         end
         4'd8: begin
