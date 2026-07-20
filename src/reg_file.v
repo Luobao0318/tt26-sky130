@@ -12,6 +12,7 @@ module reg_file (
 );
 
     reg [31:0] rf [1:15];  // x0恒为0
+    integer i;
 
     assign rdata1 = (raddr1 == 4'd0) ? 32'd0 : rf[raddr1];
     assign rdata2 = (raddr2 == 4'd0) ? 32'd0 : rf[raddr2];
