@@ -102,6 +102,14 @@ module tt_um_Luobao0318 (
 
   wire [3:0] ram_addr = (current_state == 4'd0) ? PC[5:2] : ALUOut[5:2];  // 取指用PC，访存用ALUOut
 
+  integer j;
+
+  initial begin
+    for (j = 0; j < 16; j = j + 1) begin
+        RAM[j] <= 32'd0;
+      end
+  end
+
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       PC <= 32'd0;
