@@ -164,6 +164,7 @@ module tt_um_Luobao0318 (
             PC <= (reg_rdata1+imm) & 32'hfffffffe;  // 寄存器基址+偏移量，且最低位置零
           end
         end
+        default: next_state = 4'd0;
       endcase
     end
   end
