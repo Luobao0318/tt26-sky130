@@ -1,5 +1,6 @@
 module reg_file (
     input wire clk,
+    input wire rst_n,
     input wire [3:0] raddr1,
     input wire [3:0] raddr2,
     input wire [3:0] waddr,
@@ -16,8 +17,12 @@ module reg_file (
     assign rdata2 = (raddr2 == 4'd0) ? 32'd0 : rf[raddr2];
     assign x1_low8 = rf[1][7:0];
 
-    always @(posedge clk) begin
-        if (we && (waddr != 4'd0)) begin
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            for (i = 1; i < 16; i = i + 1) begin
+                rf[i] <= 32'd0;
+            end
+        else if (we && (waddr != 4'd0)) begin
             rf[waddr] <= wdata;
         end
     end
