@@ -18,6 +18,7 @@ module alu (
             4'b0111: out = $signed(in1) >>> in2[4:0];  // sra
             4'b1000: out = ($signed(in1) < $signed(in2)) ? 32'd1 : 32'd0; // slt
             4'b1001: out = (in1 < in2) ? 32'd1 : 32'd0;  // sltu
+            4'b1010: out = in2;  // lui
             default: out = 32'd0;
         endcase
     end
