@@ -70,6 +70,7 @@ module tt_um_Luobao0318 (
 
   reg_file rf_inst (
       .clk(clk),
+      .rst_n(rst_n),
       .raddr1(IR[18:15]),  // 19位为0
       .raddr2(IR[23:20]),
       .waddr(IR[10:7]),
