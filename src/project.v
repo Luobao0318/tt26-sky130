@@ -93,7 +93,7 @@ module tt_um_Luobao0318 (
     endcase
   end
 
-  wire [31:0] alu_in1 = sel_alu_in1 ? PC : A;
+  wire [31:0] alu_in1 = sel_alu_in1 ? (PC - 4) : A;
   wire [31:0] alu_in2 = sel_alu_in2 ? B : imm;
 
   // R型指令下add与sub判断
