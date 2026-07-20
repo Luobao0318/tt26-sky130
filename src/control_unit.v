@@ -65,8 +65,8 @@ module control_unit (
 
             S_EXECUTE_ALU: begin
                 next_state = S_WRITEBACK_ALU;
-                sel_alu_in1 = (opcode == 7'b0110011) ? 1'b1 : 1'b0;  // auipc选pc，其余A
-                sel_alu_in2 = (opcode == 7'b0010011) ? 1'b1 : 1'b0;  // I型选立即数(0)，R型选B(1)
+                sel_alu_in1 = (opcode == 7'b0010111) ? 1'b1 : 1'b0;  // auipc选pc，其余A
+                sel_alu_in2 = (opcode == 7'b0110011) ? 1'b1 : 1'b0;  // I型选立即数(0)，R型选B(1)
                 if (opcode == 7'b0110111) begin
                     alu_op = 4'b1010;  // lui
                 end
