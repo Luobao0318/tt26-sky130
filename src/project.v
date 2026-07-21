@@ -165,6 +165,6 @@ module tt_um_Luobao0318 (
   assign uio_out = 0;  // 双向IO输出值
   assign uio_oe = 0;   // 双向IO输出使能信号
 
-  wire _unused = &{ena, uio_in, 1'b0};
+  wire _unused = &{ena, ui_in, uio_in, 1'b0};
 
 endmodule
