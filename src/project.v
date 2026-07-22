@@ -130,8 +130,8 @@ module tt_um_Luobao0318 (
             3'b000: begin  // lb
               case (ALUOut[1:0])
                 2'b00: MDR <= {{24{RAM[ram_addr][7]}}, RAM[ram_addr][7:0]};
-                2'b01: MDR <= {{24{RAM[ram_addr][15]}}, RAM[ram_addr][15:0]};
-                2'b10: MDR <= {{24{RAM[ram_addr][23]}}, RAM[ram_addr][23:18]};
+                2'b01: MDR <= {{24{RAM[ram_addr][15]}}, RAM[ram_addr][15:8]};
+                2'b10: MDR <= {{24{RAM[ram_addr][23]}}, RAM[ram_addr][23:16]};
                 2'b11: MDR <= {{24{RAM[ram_addr][31]}}, RAM[ram_addr][31:24]};
               endcase
             end
