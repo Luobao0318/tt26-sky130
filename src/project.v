@@ -37,7 +37,7 @@ module tt_um_Luobao0318 (
   wire alu_zero;
 
   wire rd_illegal = (IR[6:0] != 7'b0100011 && IR[6:0] != 7'b1100011) && IR[11];  // store和branch无rd
-  wire rs1_illegal = (IR[6:0] != 7'b0110111 && IR[6:0] != 7'b1101111) && IR[19]; // lui和jal无rs1
+  wire rs1_illegal = (IR[6:0] != 7'b0110111 && IR[6:0] != 7'b1101111 && IR[6:0] != 7'b0010111) && IR[19]; // lui,jal,auipc无rs1
   wire rs2_illegal = (IR[6:0] == 7'b0110011 || IR[6:0] == 7'b0100011 || IR[6:0] == 7'b1100011) && IR[24]; // 仅R, store, branch有rs2
   wire illegal_instr = rd_illegal || rs1_illegal || rs2_illegal;
 
@@ -125,17 +125,60 @@ module tt_um_Luobao0318 (
         4'd4: begin
           ALUOut <= alu_result;
         end
-        4'd5: begin
-          MDR <= RAM[ram_addr];
+        4'd5: begin  // S_MEM_READ
+          case (IR[14:12])
+            3'b000: begin  // lb
+              case (ALUOut[1:0])
+                2'b00: MDR <= {{24{RAM[ram_addr][7]}}, RAM[ram_addr][7:0]};
+                2'b01: MDR <= {{24{RAM[ram_addr][15]}}, RAM[ram_addr][15:0]};
+                2'b10: MDR <= {{24{RAM[ram_addr][23]}}, RAM[ram_addr][23:18]};
+                2'b11: MDR <= {{24{RAM[ram_addr][31]}}, RAM[ram_addr][31:24]};
+              endcase
+            end
+            3'b001: begin  // lh
+              if (ALUOut[1] == 1'b0) MDR <= {{16{RAM[ram_addr][15]}}, RAM[ram_addr][15:0]};
+              else MDR <= {{16{RAM[ram_addr][31]}}, RAM[ram_addr][31:16]};
+            end
+            3'b010: MDR <= RAM[ram_addr];  // lw
+            3'b100: begin  // lbu
+              case (ALUOut[1:0])
+                2'b00: MDR <= {24'b0, RAM[ram_addr][7:0]};
+                2'b01: MDR <= {24'b0, RAM[ram_addr][15:8]};
+                2'b10: MDR <= {24'b0, RAM[ram_addr][23:16]};
+                2'b11: MDR <= {24'b0, RAM[ram_addr][31:24]};
+              endcase
+            end
+            3'b101: begin  // lhu
+              if (ALUOut[1] == 1'b0) MDR <= {16'b0, RAM[ram_addr][15:0]};
+              else MDR <= {16'b0, RAM[ram_addr][31:16]};
+            end
+            default: MDR <= RAM[ram_addr];
+          endcase
         end
         4'd6: begin
           // PC <= ALUOut;
         end
         4'd7: begin
           if (mem_write_en) begin
-            RAM[ram_addr] <= reg_rdata2;  // store
+            case (IR[14:12])
+              3'b000: begin  // sb
+                case (ALUOut[1:0])
+                  2'b00: RAM[ram_addr][7:0] <= reg_rdata2[7:0];
+                  2'b01: RAM[ram_addr][15:8] <= reg_rdata2[7:0];
+                  2'b10: RAM[ram_addr][23:16] <= reg_rdata2[7:0];
+                  2'b11: RAM[ram_addr][31:24] <= reg_rdata2[7:0];
+                endcase
+              end
+              3'b001: begin  // sh
+                if (ALUOut[1] == 1'b0) RAM[ram_addr][15:0] <= reg_rdata2[15:0];
+                else RAM[ram_addr][31:16] <= reg_rdata2[15:0];
+              end
+              3'b010: begin  // sw
+                RAM[ram_addr] <= reg_rdata2;
+              end
+              default: RAM[ram_addr] <= reg_rdata2;
+            endcase
           end
-          // PC <= ALUOut;
         end
         4'd8: begin
           if (alu_zero && IR[14:12] == 3'b000) begin  // beq
