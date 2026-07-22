@@ -99,6 +99,7 @@ module tt_um_Luobao0318 (
   /***************************************************************************************************/
 
   wire [3:0] ram_addr = (current_state == 4'd0) ? PC[5:2] : ALUOut[5:2];  // 取指用PC，访存用ALUOut
+  wire [31:0] ram_rdata = RAM[ram_addr];
 
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -110,7 +111,7 @@ module tt_um_Luobao0318 (
     else begin
       case (current_state)
         4'd0: begin  // S_FETCH
-          IR <= RAM[ram_addr];
+          IR <= ram_rdata;
           PC <= PC + 4;
         end
         4'd1: begin  // S_DECODE
@@ -129,30 +130,30 @@ module tt_um_Luobao0318 (
           case (IR[14:12])
             3'b000: begin  // lb
               case (ALUOut[1:0])
-                2'b00: MDR <= {{24{RAM[ram_addr][7]}}, RAM[ram_addr][7:0]};
-                2'b01: MDR <= {{24{RAM[ram_addr][15]}}, RAM[ram_addr][15:8]};
-                2'b10: MDR <= {{24{RAM[ram_addr][23]}}, RAM[ram_addr][23:16]};
-                2'b11: MDR <= {{24{RAM[ram_addr][31]}}, RAM[ram_addr][31:24]};
+                2'b00: MDR <= {{24{ram_rdata[7]}}, ram_rdata[7:0]};
+                2'b01: MDR <= {{24{ram_rdata[15]}}, ram_rdata[15:8]};
+                2'b10: MDR <= {{24{ram_rdata[23]}}, ram_rdata[23:16]};
+                2'b11: MDR <= {{24{ram_rdata[31]}}, ram_rdata[31:24]};
               endcase
             end
             3'b001: begin  // lh
-              if (ALUOut[1] == 1'b0) MDR <= {{16{RAM[ram_addr][15]}}, RAM[ram_addr][15:0]};
-              else MDR <= {{16{RAM[ram_addr][31]}}, RAM[ram_addr][31:16]};
+              if (ALUOut[1] == 1'b0) MDR <= {{16{ram_rdata[15]}}, ram_rdata[15:0]};
+              else MDR <= {{16{ram_rdata[31]}}, ram_rdata[31:16]};
             end
-            3'b010: MDR <= RAM[ram_addr];  // lw
+            3'b010: MDR <= ram_rdata;  // lw
             3'b100: begin  // lbu
               case (ALUOut[1:0])
-                2'b00: MDR <= {24'b0, RAM[ram_addr][7:0]};
-                2'b01: MDR <= {24'b0, RAM[ram_addr][15:8]};
-                2'b10: MDR <= {24'b0, RAM[ram_addr][23:16]};
-                2'b11: MDR <= {24'b0, RAM[ram_addr][31:24]};
+                2'b00: MDR <= {24'b0, ram_rdata[7:0]};
+                2'b01: MDR <= {24'b0, ram_rdata[15:8]};
+                2'b10: MDR <= {24'b0, ram_rdata[23:16]};
+                2'b11: MDR <= {24'b0, ram_rdata[31:24]};
               endcase
             end
             3'b101: begin  // lhu
-              if (ALUOut[1] == 1'b0) MDR <= {16'b0, RAM[ram_addr][15:0]};
-              else MDR <= {16'b0, RAM[ram_addr][31:16]};
+              if (ALUOut[1] == 1'b0) MDR <= {16'b0, ram_rdata[15:0]};
+              else MDR <= {16'b0, ram_rdata[31:16]};
             end
-            default: MDR <= RAM[ram_addr];
+            default: MDR <= ram_rdata;
           endcase
         end
         4'd6: begin
@@ -163,15 +164,15 @@ module tt_um_Luobao0318 (
             case (IR[14:12])
               3'b000: begin  // sb
                 case (ALUOut[1:0])
-                  2'b00: RAM[ram_addr][7:0] <= reg_rdata2[7:0];
-                  2'b01: RAM[ram_addr][15:8] <= reg_rdata2[7:0];
-                  2'b10: RAM[ram_addr][23:16] <= reg_rdata2[7:0];
-                  2'b11: RAM[ram_addr][31:24] <= reg_rdata2[7:0];
+                  2'b00: RAM[ram_addr] <= {ram_rdata[31:8], reg_rdata2[7:0]};
+                  2'b01: RAM[ram_addr] <= {ram_rdata[31:16], reg_rdata2[7:0], ram_rdata[7:0]};
+                  2'b10: RAM[ram_addr] <= {ram_rdata[31:24], reg_rdata2[7:0], ram_rdata[15:0]};
+                  2'b11: RAM[ram_addr] <= {reg_rdata2[7:0], ram_rdata[23:0]};
                 endcase
               end
               3'b001: begin  // sh
-                if (ALUOut[1] == 1'b0) RAM[ram_addr][15:0] <= reg_rdata2[15:0];
-                else RAM[ram_addr][31:16] <= reg_rdata2[15:0];
+                if (ALUOut[1] == 1'b0) RAM[ram_addr] <= {ram_rdata[31:16], reg_rdata2[15:0]};
+                else RAM[ram_addr] <= {reg_rdata2[15:0], ram_rdata[15:0]};
               end
               3'b010: begin  // sw
                 RAM[ram_addr] <= reg_rdata2;
